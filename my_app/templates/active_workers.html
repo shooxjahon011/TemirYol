@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktiv Ishchilar Monitoringi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --neon: #00f2ff;
+            --bg: #0a0a0b;
+            --glass: rgba(255, 255, 255, 0.05);
+            --live: #00ff88;
+        }
+
+        body {
+            margin: 0; background: var(--bg); color: white;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .header {
+            padding: 20px; background: rgba(0,0,0,0.8);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+
+        .status-bar {
+            background: rgba(0, 255, 136, 0.1); border: 1px solid var(--live);
+            padding: 10px 20px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px; font-size: 14px;
+        }
+
+        .pulse {
+            width: 10px; height: 10px; background: var(--live);
+            border-radius: 50%; box-shadow: 0 0 10px var(--live);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .worker-card {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 15px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+
+        .worker-card:hover {
+            border-color: var(--neon); transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .worker-info { display: flex; align-items: center; gap: 15px; }
+
+        .avatar {
+            width: 50px; height: 50px; border-radius: 15px;
+            object-fit: cover; border: 2px solid rgba(0, 242, 255, 0.3);
+        }
+
+        .name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+        .time { font-size: 12px; color: #888; display: flex; align-items: center; gap: 5px; }
+
+        .track-btn {
+            background: var(--neon); color: #000; padding: 10px 18px;
+            border-radius: 14px; text-decoration: none; font-size: 13px;
+            font-weight: 800; text-transform: uppercase; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .track-btn:hover { box-shadow: 0 0 15px var(--neon); }
+
+        .empty-state {
+            text-align: center; padding: 50px 20px; color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="/bosspage/" style="color:white; font-size: 20px;"><i class="fas fa-chevron-left"></i></a>
+        <h2 style="margin:0; font-size:18px; letter-spacing: 1px;">LIVE MONITORING</h2>
+        <div style="width:20px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="status-bar">
+            <div class="pulse"></div>
+            <span>Hozirda <b>{{ count }}</b> ishchi aktiv zonada</span>
+        </div>
+
+        {% for loc in active_locations %}
+        <div class="worker-card">
+            <div class="worker-info">
+                <img src="{% if loc.user.image %}{{ loc.user.image.url }}{% else %}{{ default_avatar }}{% endif %}" class="avatar">
+                <div>
+                    <div class="name">{{ loc.user.full_name|default:loc.user.login }}</div>
+                    <div class="time">
+                        <i class="far fa-clock"></i> {{ loc.last_updated|date:"H:i:s" }}
+                    </div>
+                </div>
+            </div>
+            <a href="/track-worker/{{ loc.user.id }}/" class="track-btn">
+                <i class="fas fa-location-arrow"></i> KUZATISH
+            </a>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-user-slash" style="font-size: 40px; margin-bottom: 10px; display: block;"></i>
+            Hozirda hech kim ishda emas
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

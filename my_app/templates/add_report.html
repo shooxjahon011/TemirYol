@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hisobot: {{ worker.full_name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+        #bg-video {
+            position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            z-index: -2; transform: translate(-50%, -50%); object-fit: cover;
+            filter: brightness(0.3);
+        }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
+
+        .content { padding: 20px; max-width: 500px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        label { display:block; margin-top:15px; color:#00f2ff; font-size:12px; font-weight:bold; text-transform: uppercase; }
+
+        input {
+            width: 100%; padding: 12px; margin-top: 5px;
+            background: rgba(255,255,255,0.9); border: none;
+            color: black; border-radius: 10px; box-sizing: border-box;
+            font-weight: 600; outline: none;
+        }
+        input:focus { box-shadow: 0 0 10px #00f2ff; }
+
+        button {
+            width: 100%; padding: 15px; background: linear-gradient(45deg, #00f2ff, #00d2ff);
+            border:none; border-radius: 12px; font-weight:900; cursor:pointer;
+            margin-top:30px; font-size:16px; color:black; text-transform: uppercase;
+        }
+
+        .back-link {
+            color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            margin-bottom: 20px; background: rgba(255,255,255,0.1);
+            padding: 10px 15px; border-radius: 10px; font-size: 14px;
+        }
+
+        h2 { color: #00f2ff; margin-top: 0; font-size: 22px; }
+        .error-msg { background: rgba(255,0,0,0.2); border: 1px solid red; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <video autoplay loop playsinline muted id="bg-video">
+        <source src="{{ video_url }}" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <a href="/kunlik/" class="back-link"><i class="fas fa-arrow-left"></i> Orqaga</a>
+
+        <div class="form-container">
+            <h2><i class="fas fa-file-signature"></i> Hisobot kiritish</h2>
+            <p style="color:#00f2ff; margin-bottom: 20px;">
+                Ishchi: <b>{{ worker.full_name }}</b><br>
+                <small style="color: #aaa;">Tabel: {{ worker.tabel_raqami }}</small>
+            </p>
+
+            {% if error %}
+                <div class="error-msg">⚠️ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label>Sana:</label>
+                <input type="date" name="sana" required value="{{ today_date }}">
+
+                <label>Norma soati:</label>
+                <input type="number" name="norma" step="0.1" required placeholder="Masalan: 8.0">
+
+                <label>Oklad (tarif stavka):</label>
+                <input type="number" name="oklad" required placeholder="0">
+
+                <label>Ishlangan soati:</label>
+                <input type="number" name="ishlagan" step="0.1" required placeholder="Masalan: 8.0">
+
+                <label>Tungi soati:</label>
+                <input type="number" name="tungi" step="0.1" value="0" placeholder="0.0">
+
+                <label>Bayram soati:</label>
+                <input type="number" name="bayram" step="0.1" value="0" placeholder="0.0">
+
+                <button type="submit">SAQLASH VA TASDIQLASH</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring | TemirYo'l</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; padding: 0; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; background: #000; cursor: pointer; }
+        #bg-video { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: -2; transform: translate(-50%, -50%); object-fit: cover; pointer-events: none; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: -1; }
+
+        .header { background: rgba(60, 0, 0, 0.9); padding: 15px; text-align: center; border-bottom: 2px solid #ff4b4b; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: space-between; }
+        .header-title { flex-grow: 1; text-align: center; font-weight: 900; color: #ff4b4b; letter-spacing: 1px; }
+
+        .content { padding: 20px; max-width: 600px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .admin-box { background: rgba(30, 0, 0, 0.5); padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255, 75, 75, 0.4); backdrop-filter: blur(10px); }
+        textarea { width: 100%; height: 100px; background: rgba(0,0,0,0.6); color: white; border-radius: 12px; padding: 12px; border: 1px solid #555; outline: none; resize: none; font-size: 14px; }
+
+        .file-label { background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 10px; font-size: 13px; cursor: pointer; border: 1px dashed #777; transition: 0.3s; }
+        .file-label:hover { background: rgba(255,255,255,0.2); }
+
+        .msg-card { background: rgba(40, 0, 0, 0.5); border-left: 5px solid #ff4b4b; padding: 20px; border-radius: 15px; margin-bottom: 20px; backdrop-filter: blur(10px); animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .msg-header { color: #ff4b4b; font-weight: bold; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .msg-body { white-space: pre-wrap; line-height: 1.6; font-size: 15px; color: #eee; }
+        .msg-footer { text-align: right; font-size: 10px; opacity: 0.5; margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        .btn { background: #ff4b4b; color: white; border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: 900; transition: 0.3s; }
+        .btn:active { transform: scale(0.9); }
+    </style>
+</head>
+<body>
+    <video loop playsinline id="bg-video">
+        <source src="{{ video_url }}" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
+    <div class="header">
+        <a href="/second/" style="color:white; font-size: 20px;"><i class="fas fa-arrow-left"></i></a>
+        <div class="header-title">Monitoring tizimi</div>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="content">
+        {% if is_boss %}
+        <div class="admin-box">
+            <h3 style="margin-top:0; color:#ff4b4b; font-size:16px;">BOSS: BILDIRISHNOMA YUBORISH</h3>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <textarea name="text" placeholder="Voqea tafsilotlarini yozing..." required></textarea>
+                <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:10px;">
+                    <label class="file-label">
+                        <i class="fas fa-paperclip"></i> Fayl biriktirish
+                        <input type="file" name="admin_file" accept=".pdf,.docx,.xlsx" style="display:none;">
+                    </label>
+                    <button type="submit" class="btn">YUBORISH</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        {% for msg in messages %}
+        <div class="msg-card">
+            <div class="msg-header"><i class="fas fa-bullhorn"></i> RASMIY BILDIRISHNOMA</div>
+            <div class="msg-body">{{ msg.text }}</div>
+            <div class="msg-footer">{{ msg.time }}</div>
+        </div>
+        {% empty %}
+        <p style="text-align:center; opacity:0.5; margin-top:50px;">Hozircha bildirishnomalar yo'q.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        const video = document.getElementById('bg-video');
+
+        function enableAudio() {
+            video.muted = false;
+            video.volume = 0.8;
+            video.play().catch(e => console.log("Ovoz yoqilmadi"));
+        }
+
+        document.body.addEventListener('click', enableAudio, { once: true });
+        document.body.addEventListener('touchstart', enableAudio, { once: true });
+
+        window.onload = () => {
+            video.muted = true;
+            video.play();
+        };
+    </script>
+</body>
+</html>
