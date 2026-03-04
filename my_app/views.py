@@ -536,7 +536,7 @@ def delete_message(request, msg_id):
             msg.delete()
             return HttpResponse("OK")
     return HttpResponse("Xato", status=400)
-def login_view(request):
+def login(request):
     error_message = ""
 
     if request.method == "POST":
@@ -828,3 +828,4 @@ def update_location(request):
         return JsonResponse({"status": "success", "message": "Joylashuv yangilandi"})
 
     return JsonResponse({"status": "error", "message": "Faqat POST so'rovi qabul qilinadi"}, status=405)
+
